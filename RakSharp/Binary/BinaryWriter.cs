@@ -9,6 +9,7 @@ public class BinaryWriter(byte[] buffer) {
 
     public byte[] Buffer { get; } = buffer;
     public int Position { get; set; }
+    public byte[] ToArray() => Buffer[..Position];
 
     public void WriteByte(byte value) => Buffer[Position++] = value;
     public void WriteBoolean(bool value) => Buffer[Position++] = (byte)(value ? 1 : 0);
@@ -105,6 +106,19 @@ public class BinaryWriter(byte[] buffer) {
         BinaryPrimitives.WriteUInt64BigEndian(Buffer.AsSpan()[Position..(Position + Info.SizeOfLong)], value);
         Position += Info.SizeOfLong;
     }
+    
+    public void WriteTriadLittleEndian(int value) {
+        
+        if (value is < 0 or > 0xFFFFFF)
+            throw new ArgumentOutOfRangeException(nameof(value), "Triad must be between 0 and 16777215 (0xFFFFFF).");
+
+        if (Position + 3 > Buffer.Length)
+            throw new InvalidOperationException("Write exceeds buffer size.");
+
+        Buffer[Position++] = (byte)(value & 0xFF);
+        Buffer[Position++] = (byte)((value >> 8) & 0xFF);
+        Buffer[Position++] = (byte)((value >> 16) & 0xFF);
+    }
 
     public void WriteString(string value) {
         
@@ -129,9 +143,9 @@ public class BinaryWriter(byte[] buffer) {
         Position += MessagesIdentifier.Magic.Length;
     }
     
-    public void WriteIPEndPoint(IPEndPoint? endPoint) {
+    public void WriteIpEndPoint(IPEndPoint? endPoint) {
         
-        switch (endPoint.Address.AddressFamily) {
+        switch (endPoint?.Address.AddressFamily) {
             
             case System.Net.Sockets.AddressFamily.InterNetwork: {
                 

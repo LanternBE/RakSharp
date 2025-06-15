@@ -29,6 +29,8 @@ public static class MessagesIdentifier {
         ConnectionRequestAccepted = 16,
         NewIncomingConnection = 19,
         DisconnectionNotification = 21,
-        Datagram = 132 // aka FrameSet
+        Datagram = 132, // aka FrameSet
+        NegativeAcknowledgement = 160,
+        Acknowledgement = 192
     }
 }

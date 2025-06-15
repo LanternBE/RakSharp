@@ -30,7 +30,7 @@ public class OpenConnectionReplySecond : OfflineMessage {
         
         writer.WriteMagic();
         writer.WriteLongBigEndian(ServerId);
-        writer.WriteIPEndPoint(ClientAddress);
+        writer.WriteIpEndPoint(ClientAddress);
         writer.WriteShortBigEndian(MaximumTransmissionUnit);
         writer.WriteBoolean(HasEncryption);
     }
@@ -39,7 +39,7 @@ public class OpenConnectionReplySecond : OfflineMessage {
         
         reader.ReadMagic();
         ServerId = reader.ReadLongBigEndian();
-        ClientAddress = reader.ReadIPEndPoint();
+        ClientAddress = reader.ReadIpEndPoint();
         MaximumTransmissionUnit = reader.ReadShortBigEndian();
         HasEncryption = reader.ReadBoolean();
     }

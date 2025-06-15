@@ -11,6 +11,7 @@ public class BinaryReader(byte[] buffer) {
     public int Position { get; set; }
     public int Remaining => Buffer.Length - Position;
     
+    public bool IsAtEnd() => Position >= Buffer.Length;
     public byte ReadByte() => Buffer[Position++];
     public bool ReadBoolean() => ReadByte() is 1;
     public byte[] ReadRemainingBytes() => ReadBytes(Buffer.Length - Position);
@@ -161,6 +162,17 @@ public class BinaryReader(byte[] buffer) {
         return value;
     }
     
+    public int ReadTriadLittleEndian() {
+        
+        if (Remaining < 3)
+            throw new ArgumentOutOfRangeException(nameof(ReadTriadLittleEndian), "Not enough data to read a triad (3 bytes).");
+
+        var value = Buffer[Position] | (Buffer[Position + 1] << 8) | (Buffer[Position + 2] << 16);
+        Position += 3;
+        
+        return value;
+    }
+    
     public string ReadString() {
         
         var length = ReadUnsignedShortBigEndian();
@@ -179,7 +191,7 @@ public class BinaryReader(byte[] buffer) {
         Position += MessagesIdentifier.Magic.Length;
     }
     
-    public IPEndPoint? ReadIPEndPoint() {
+    public IPEndPoint ReadIpEndPoint() {
         
         var family = ReadByte();
         

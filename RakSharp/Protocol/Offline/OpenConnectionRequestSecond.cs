@@ -28,7 +28,7 @@ public class OpenConnectionRequestSecond : OfflineMessage {
     protected override void WritePayload(BinaryWriter writer) {
         
         writer.WriteMagic();
-        writer.WriteIPEndPoint(ServerAddress);
+        writer.WriteIpEndPoint(ServerAddress);
         writer.WriteShortBigEndian(MaximumTransmissionUnit);
         writer.WriteLongBigEndian(ClientId);
     }
@@ -36,7 +36,7 @@ public class OpenConnectionRequestSecond : OfflineMessage {
     protected override void ReadPayload(BinaryReader reader) {
         
         reader.ReadMagic();
-        ServerAddress = reader.ReadIPEndPoint();
+        ServerAddress = reader.ReadIpEndPoint();
         MaximumTransmissionUnit = reader.ReadShortBigEndian();
         ClientId = reader.ReadLongBigEndian();
     }
