@@ -1,4 +1,6 @@
-﻿using RakSharp.Utils;
+﻿using System.Buffers;
+using RakSharp.Packet;
+using RakSharp.Utils;
 using BinaryReader = RakSharp.Binary.BinaryReader;
 using BinaryWriter = RakSharp.Binary.BinaryWriter;
 
@@ -98,6 +100,45 @@ public class EncapsulatedPacket {
                      + (PacketReliability.IsSequenced(Reliability) ? 3 : 0) 
                      + (PacketReliability.IsSequencedOrOrdered(Reliability) ? 3 + 1 : 0) 
                      + (SplitInfo != null ? SplitInfoLength : 0);
+    }
+
+    public static EncapsulatedPacket? Create(object packet, int reliability, int connectionReliableIndex, int connectionOrderedIndex, byte orderChannel = 0) {
+        
+        var reliableIndex = PacketReliability.IsReliable(reliability) ? connectionReliableIndex : 0;
+        var orderIndex = PacketReliability.IsOrdered(reliability) ? connectionOrderedIndex : 0;
+
+        var buffer = ArrayPool<byte>.Shared.Rent(1500);
+        try {
+            var writer = new BinaryWriter(buffer);
+
+            switch (packet) {
+                case OnlineMessage onlineMessage:
+                    onlineMessage.Write(writer);
+                    break;
+                case OfflineMessage offlineMessage:
+                    offlineMessage.Write(writer);
+                    break;
+                default:
+                    throw new PacketClassException(packet.GetType().Name,
+                        "Unsupported packet type for EncapsulatedPacket creation.");
+            }
+
+            var data = writer.ToArray();
+            return new EncapsulatedPacket {
+                Reliability = reliability,
+                MessageIndex = PacketReliability.IsReliable(reliability) ? reliableIndex : null,
+                OrderIndex = PacketReliability.IsOrdered(reliability) ? orderIndex : null,
+                OrderChannel = orderChannel,
+                Buffer = data
+            };
+        }
+        catch (Exception x) {
+            Logger.LogError("Error creating EncapsulatedPacket:", x);
+        } finally {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+        
+        return null;
     }
 
     public int GetTotalLength() => GetHeaderLength() + Buffer.Length;

@@ -87,3 +87,9 @@ public class PacketCorruptedException : RakSharpException {
         RawData = rawData;
     }
 }
+
+/// <summary>
+/// Exception thrown when packet class is invalid
+/// </summary>
+public class PacketClassException(string clazz, string reason)
+    : RakSharpException($"Packet class '{clazz}' is corrupted: {reason}");
