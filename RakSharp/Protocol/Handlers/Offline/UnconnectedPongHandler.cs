@@ -1,8 +1,6 @@
-﻿using System.Net;
-using RakSharp.Protocol.Offline;
-using RakSharp.Utils;
+﻿using RakSharp.Protocol.Offline;
 
-namespace RakSharp.Protocol.Handlers;
+namespace RakSharp.Protocol.Handlers.Offline;
 
 public class UnconnectedPongHandler : OfflinePacketHandler<UnconnectedPong> {
     

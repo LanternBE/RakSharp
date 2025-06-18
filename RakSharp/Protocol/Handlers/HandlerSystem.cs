@@ -1,4 +1,6 @@
-﻿using RakSharp.Protocol.Offline;
+﻿using RakSharp.Protocol.Handlers.Offline;
+using RakSharp.Protocol.Handlers.Online;
+using RakSharp.Protocol.Offline;
 using RakSharp.Protocol.Online;
 
 namespace RakSharp.Protocol.Handlers;

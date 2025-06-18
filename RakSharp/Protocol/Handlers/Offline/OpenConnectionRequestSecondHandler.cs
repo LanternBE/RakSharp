@@ -1,6 +1,6 @@
 ﻿using RakSharp.Protocol.Offline;
 
-namespace RakSharp.Protocol.Handlers;
+namespace RakSharp.Protocol.Handlers.Offline;
 
 public class OpenConnectionRequestSecondHandler : OfflinePacketHandler<OpenConnectionRequestSecond> {
     
@@ -9,6 +9,7 @@ public class OpenConnectionRequestSecondHandler : OfflinePacketHandler<OpenConne
         var response = OpenConnectionReplySecond.Create(Server.ServerInfo.ServerGuid, Server.ServerAddress, 1492, false); // TODO: Add encryption.
         await SendOfflineMessageAsync(response);
         
+        Server.SessionsManager.CreateSession(ClientEndPoint, Packet.ClientId);
         return true;
     }
 }

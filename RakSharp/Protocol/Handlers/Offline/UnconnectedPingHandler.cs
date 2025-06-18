@@ -2,7 +2,7 @@
 using RakSharp.Protocol.Offline;
 using RakSharp.Utils;
 
-namespace RakSharp.Protocol.Handlers;
+namespace RakSharp.Protocol.Handlers.Offline;
 
 public class UnconnectedPingHandler : OfflinePacketHandler<UnconnectedPing> {
     
@@ -12,7 +12,8 @@ public class UnconnectedPingHandler : OfflinePacketHandler<UnconnectedPing> {
             Logger.LogWarn($"Banned IP {ClientEndPoint} attempted to ping");
             return false;
         }
-        
+
+        //Server.ServerInfo.OnlinePlayers = Server.SessionsManager.GetSessions().Count;
         Server.ServerInfo.OnlinePlayers = 9; // TODO: Replace this with ^, we need this for testing if the raknet is actually working lol.
         var response = UnconnectedPong.Create(
             Packet.Timestamp, 

@@ -1,6 +1,6 @@
 ﻿using RakSharp.Protocol.Offline;
 
-namespace RakSharp.Protocol.Handlers;
+namespace RakSharp.Protocol.Handlers.Offline;
 
 public class OpenConnectionReplyFirstHandler : OfflinePacketHandler<OpenConnectionReplyFirst> {
     

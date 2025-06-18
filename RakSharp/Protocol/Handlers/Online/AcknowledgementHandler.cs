@@ -2,7 +2,7 @@
 using RakSharp.Protocol.Online;
 using RakSharp.Utils;
 
-namespace RakSharp.Protocol.Handlers;
+namespace RakSharp.Protocol.Handlers.Online;
 
 public class AcknowledgementHandler : OnlinePacketHandler<Acknowledgement> {
     

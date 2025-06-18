@@ -2,7 +2,7 @@
 using RakSharp.Protocol.Online;
 using RakSharp.Utils;
 
-namespace RakSharp.Protocol.Handlers;
+namespace RakSharp.Protocol.Handlers.Online;
 
 public class DatagramHandler : OnlinePacketHandler<Datagram> {
     
@@ -12,9 +12,19 @@ public class DatagramHandler : OnlinePacketHandler<Datagram> {
             Logger.LogWarn($"Banned IP {ClientEndPoint} attempted to ping");
             return false;
         }
+        
+        var clientSession = Server.SessionsManager.GetSession(ClientEndPoint);
+        if (clientSession is null) {
+            Logger.LogError($"No Session found for ({ClientEndPoint}) while handling his datagram.");
+            return false;
+        }
 
-        Console.WriteLine("hey nigga");
-        Console.WriteLine(Packet.Packets.Count);
+        await SendOnlineMessageAsync(Acknowledgement.Create([Packet.SeqNumber]));
+        Logger.LogInfo($"Sent acknowledgement to server {ClientEndPoint}");
+        
+        clientSession.UpdateLastPacketTime();
+        // TODO: Create a function that can handle all the Packet.Packets, maybe creating a new handler for these packets...
+        
         return true;
     }
     

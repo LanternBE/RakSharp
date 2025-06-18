@@ -32,6 +32,7 @@ public static class DynamicPacketFactory {
         
         RegisterOnlinePacketType<Datagram>();
         RegisterOnlinePacketType<Acknowledgement>();
+        RegisterOnlinePacketType<NegativeAcknowledgement>();
     }
     
     public static void RegisterOfflinePacketType<T>() where T : OfflineMessage, new() {
