@@ -20,6 +20,8 @@ public class ClientSession : IDisposable {
     
     public DateTime LastPacketTime { get; set; } = DateTime.UtcNow;
     public DateTime ConnectedTime { get; set; }
+    
+    private readonly Dictionary<int, (object Packet, DateTime SentTime)> _pendingReliablePackets = new();
 
     public ClientSession(long clientId, IPEndPoint remoteEndPoint) {
         
@@ -30,6 +32,10 @@ public class ClientSession : IDisposable {
         ConnectedTime = DateTime.UtcNow;
         
         Logger.LogInfo($"ClientSession created for ({remoteEndPoint})");
+    }
+    
+    public void TrackReliablePacket(int sequenceNumber, object packet) {
+        _pendingReliablePackets[sequenceNumber] = (packet, DateTime.UtcNow);
     }
 
     public int GetNextSequenceNumber() {
