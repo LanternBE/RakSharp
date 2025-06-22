@@ -74,31 +74,40 @@ public abstract class EncapsulatedPacketHandler<T> {
     public abstract Task<bool> HandleAsync();
 
     protected async Task SendEncapsulatedPacketAsync((EncapsulatedPacket packet, byte[] buffer) response) {
+        
         var session = Server.SessionsManager.GetSession(ClientEndPoint);
         if (session is null) {
             Logger.LogError($"Session not found for the client endpoint ({ClientEndPoint})");
             return;
         }
-        var datagram = Datagram.Create(0, [response.packet], session.GetNextSequenceNumber());
         
+        var datagram = Datagram.Create(0, [response.packet], session.GetNextSequenceNumber());
         await Socket.SendToAsync(datagram.buffer, SocketFlags.None, ClientEndPoint);
     }
 
     protected async Task SendConnectedPongAsync(long time) {
-        var session = Server.SessionsManager.GetSession(ClientEndPoint);
         
+        var session = Server.SessionsManager.GetSession(ClientEndPoint);
         if (session == null) {
             Logger.LogWarn($"Received connected ping from unknown session: {ClientEndPoint}");
             return;
         }
+
+        var connectedPong = ConnectedPong.Create(time, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        var encapsulatedPacket = EncapsulatedPacket.Create(connectedPong, PacketReliability.Reliable, session.GetNextReliableIndex(), session.GetNextOrderedIndex());
         
-        var connectedPong = EncapsulatedPacket.Create(ConnectedPong.Create(time, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()), PacketReliability.Reliable, session.GetNextReliableIndex(), session.GetNextOrderedIndex());
-        if (connectedPong is null) {
+        if (encapsulatedPacket is null) {
             Logger.LogError($"Failed to create connected pong for session: {ClientEndPoint}");
             return;
         }
-        if (connectedPong.Reliability is PacketReliability.Reliable or PacketReliability.ReliableOrdered) {
-            session.TrackReliablePacket(session.GetNextSequenceNumber());
+        
+        var sequenceNumber = session.GetNextSequenceNumber();
+        var datagram = Datagram.Create(0, [encapsulatedPacket], sequenceNumber);
+        
+        if (encapsulatedPacket.Reliability is PacketReliability.Reliable or PacketReliability.ReliableOrdered) {
+            session.TrackReliablePacket(sequenceNumber, connectedPong);
         }
+        
+        await Socket.SendToAsync(datagram.buffer, SocketFlags.None, ClientEndPoint);
     }
 }

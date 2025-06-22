@@ -6,7 +6,7 @@ public class UnconnectedPongHandler : OfflinePacketHandler<UnconnectedPong> {
     
     public override async Task<bool> HandleAsync() {
         
-        var response = OpenConnectionRequestFirst.Create(11, 1492);
+        var response = OpenConnectionRequestFirst.Create(MessagesIdentifier.RakNetVersion, 1492);
         await SendOfflineMessageAsync(response);
         
         return true;
