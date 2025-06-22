@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using RakSharp.Packet;
 using RakSharp.Protocol.Online;
 using RakSharp.Utils;
 
@@ -20,10 +21,22 @@ public class DatagramHandler : OnlinePacketHandler<Datagram> {
         }
 
         await SendOnlineMessageAsync(Acknowledgement.Create([Packet.SeqNumber]));
-        Logger.LogInfo($"Sent acknowledgement to server {ClientEndPoint}");
+        Logger.LogInfo($"Sent Acknowledgement to client ({ClientEndPoint})");
         
         clientSession.UpdateLastPacketTime();
-        // TODO: Create a function that can handle all the Packet.Packets, maybe creating a new handler for these packets...
+        foreach (var encapsulatedPacket in Packet.Packets) {
+            
+            var packet = EncapsulatedPacketFactory.CreateFromBuffer(encapsulatedPacket.Buffer);
+            if (packet is null) {
+                Logger.LogError("Error while parsing an EncapsulatedPacket");
+                continue;
+            }
+            
+            var success = await Server.PacketProcessor.ProcessPacketAsync(packet, encapsulatedPacket.Buffer, ClientEndPoint);
+            if (!success) {
+                Logger.LogError("Error while handling an EncapsulatedPacket");
+            }
+        }
         
         return true;
     }

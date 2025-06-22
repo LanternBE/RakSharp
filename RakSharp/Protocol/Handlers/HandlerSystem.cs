@@ -1,5 +1,6 @@
 ﻿using RakSharp.Protocol.Handlers.Offline;
 using RakSharp.Protocol.Handlers.Online;
+using RakSharp.Protocol.Handlers.Online.EncapsulatedPackets;
 using RakSharp.Protocol.Offline;
 using RakSharp.Protocol.Online;
 
@@ -19,6 +20,10 @@ public static class HandlerSystem {
         RegisterHandler<OpenConnectionReplySecond, OpenConnectionReplySecondHandler>();
         RegisterHandler<Datagram, DatagramHandler>();
         RegisterHandler<Acknowledgement, AcknowledgementHandler>();
+        RegisterHandler<NegativeAcknowledgement, NegativeAcknowledgementHandler>();
+        
+        RegisterHandler<ConnectedPing, ConnectedPingHandler>();
+        RegisterHandler<ConnectionRequest, ConnectionRequestHandler>();
     }
 
     public static void RegisterHandler<TPacket, THandler>() where THandler : class {

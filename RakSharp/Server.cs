@@ -9,12 +9,13 @@ using RakSharp.Utils.Sessions;
 namespace RakSharp;
 
 public class Server {
-    
+
     public IPEndPoint ServerAddress { get; set; } = new(IPAddress.Any, 19132);
     public Socket Socket { get; set; } = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
     public ServerInfo ServerInfo { get; set; } = new();
     public SessionsManager SessionsManager { get; set; } = new();
-    
+    public PacketProcessor PacketProcessor { get; set; }
+
     public bool IsRunning { get; set; }
 
     public async Task Start() {
@@ -33,7 +34,7 @@ public class Server {
         HandlerSystem.InitializeDefaultHandlers();
         IsRunning = true;
         
-        var packetProcessor = new PacketProcessor(Socket, this);
+        PacketProcessor = new PacketProcessor(Socket, this);
         while (IsRunning) {
             
             var sender = new IPEndPoint(IPAddress.Any, 0);
@@ -47,7 +48,7 @@ public class Server {
             }
             
             var clientIpEndPoint = (IPEndPoint)received.RemoteEndPoint;
-            var success = await packetProcessor.ProcessPacketAsync(packet, buffer, clientIpEndPoint);
+            var success = await PacketProcessor.ProcessPacketAsync(packet, buffer, clientIpEndPoint);
 
             if (!success)
                 Logger.LogError($"Failed to parse packet from {clientIpEndPoint}");
@@ -58,5 +59,7 @@ public class Server {
         
         IsRunning = false;
         Logger.LogInfo("RakNet stopped.");
+        
+        await Task.Delay(0); // TODO: Need to remove this, i used it just to disable the warning from the ide lol.
     }
 }

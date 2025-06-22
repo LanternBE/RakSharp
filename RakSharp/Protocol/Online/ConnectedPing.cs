@@ -14,6 +14,7 @@ public class ConnectedPing : OnlineMessage {
     }
 
     protected internal override void ReadHeader(BinaryReader reader) {
+        
         var packetId = reader.ReadByte();
         if (packetId != (int)PacketId) {
             throw new RakSharpException.InvalidPacketIdException((uint)PacketId, packetId, nameof(Acknowledgement));

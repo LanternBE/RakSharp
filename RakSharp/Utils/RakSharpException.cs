@@ -31,6 +31,8 @@ public partial class RakSharpException {
             PacketType = packetType;
         }
     }
+
+    public class UnknownPacketIdException(byte packetId) : RakSharpException($"Unknown packet ID: {packetId}");
     
     /// <summary>
     /// Exception thrown when a magic is wrong
@@ -91,5 +93,4 @@ public class PacketCorruptedException : RakSharpException {
 /// <summary>
 /// Exception thrown when packet class is invalid
 /// </summary>
-public class PacketClassException(string clazz, string reason)
-    : RakSharpException($"Packet class '{clazz}' is corrupted: {reason}");
+public class PacketClassException(string clazz, string reason) : RakSharpException($"Packet class '{clazz}' is corrupted: {reason}");

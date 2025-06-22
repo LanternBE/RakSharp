@@ -187,7 +187,7 @@ public static class DynamicPacketFactory {
         try {
             return CreateOnlineMessageFromBuffer(buffer);
         } catch (RakSharpException.InvalidPacketIdException) {
-            throw new RakSharpException.InvalidPacketIdException(0, firstByte, "Unknown packet type (neither online nor offline)");
+            throw new RakSharpException.UnknownPacketIdException(firstByte);
         }
     }
     
@@ -216,6 +216,135 @@ public static class DynamicPacketFactory {
         
         public override string ToString() {
             return $"Offline: {RegisteredOfflineTypes}, Online: {RegisteredOnlineTypes}, " + $"Success Cache: {SuccessCacheSize}, Failure Cache: {FailureCacheSize}";
+        }
+    }
+}
+
+public static class EncapsulatedPacketFactory {
+    
+    private static readonly List<Type> EncapsulatedPacketTypes = [];
+    
+    private static readonly ConcurrentDictionary<byte, Type> SuccessCache = new();
+    private static readonly ConcurrentDictionary<(byte firstByte, Type type), bool> FailureCache = new();
+    
+    private static readonly Lock RegistrationLock = new();
+
+    static EncapsulatedPacketFactory() {
+        RegisterDefaultEncapsulatedPackets();
+    }
+    
+    private static void RegisterDefaultEncapsulatedPackets() {
+        
+        RegisterEncapsulatedPacketType<ConnectedPing>();
+        RegisterEncapsulatedPacketType<ConnectedPong>();
+        RegisterEncapsulatedPacketType<ConnectionRequest>();
+        RegisterEncapsulatedPacketType<NewIncomingConnection>();
+        RegisterEncapsulatedPacketType<Disconnect>();
+    }
+
+    public static void RegisterEncapsulatedPacketType<T>() where T : class, new() {
+        
+        lock (RegistrationLock) {
+            
+            var type = typeof(T);
+            if (!EncapsulatedPacketTypes.Contains(type)) {
+                EncapsulatedPacketTypes.Add(type);
+            }
+        }
+    }
+
+    public static object? CreateFromBuffer(byte[] buffer) {
+        
+        if (buffer is null || buffer.Length == 0) {
+            throw new PacketCorruptedException("Unknown", "Empty buffer");
+        }
+
+        var firstByte = buffer[0];
+        Console.WriteLine($"First byte: {firstByte}");
+        Console.WriteLine(BitConverter.ToString(buffer));
+        if (SuccessCache.TryGetValue(firstByte, out var cachedType)) {
+            
+            try {
+                return TryCreateEncapsulatedPacket(cachedType, buffer);
+            } catch (RakSharpException.InvalidPacketIdException) {
+                SuccessCache.TryRemove(firstByte, out _);
+            }
+        }
+
+        var orderedTypes = EncapsulatedPacketTypes.Where(type => !FailureCache.ContainsKey((firstByte, type))).OrderBy(type => FailureCache.Count(kvp => kvp.Key.type == type)).ToList();
+        foreach (var packetType in orderedTypes) {
+            
+            try {
+                
+                var packet = TryCreateEncapsulatedPacket(packetType, buffer);
+                if (packet == null) 
+                    continue;
+                
+                SuccessCache[firstByte] = packetType;
+                return packet;
+
+            } catch (RakSharpException.InvalidPacketIdException) {
+                FailureCache[(firstByte, packetType)] = true;
+            } catch (Exception ex) {
+                throw new PacketCorruptedException(packetType.Name, ex.Message);
+            }
+        }
+        
+        throw new RakSharpException.UnknownPacketIdException(firstByte);
+    }
+
+    private static object? TryCreateEncapsulatedPacket(Type packetType, byte[] buffer) {
+        
+        var reader = new BinaryReader(buffer);
+        var packet = Activator.CreateInstance(packetType);
+        
+        if (packet == null) {
+            return null;
+        }
+        
+        dynamic dynamicPacket = packet;
+        dynamicPacket.ReadHeader(reader);
+        
+        reader.Position = 0;
+        dynamicPacket.Read(reader);
+        
+        return packet;
+    }
+
+    public static void ClearCaches() {
+        
+        SuccessCache.Clear();
+        FailureCache.Clear();
+    }
+
+    public static void Clear() {
+        
+        lock (RegistrationLock) {
+            EncapsulatedPacketTypes.Clear();
+        }
+        
+        ClearCaches();
+    }
+
+    public static EncapsulatedPacketFactoryStats GetStats() {
+        
+        return new EncapsulatedPacketFactoryStats {
+            RegisteredEncapsulatedTypes = EncapsulatedPacketTypes.Count,
+            SuccessCacheSize = SuccessCache.Count,
+            FailureCacheSize = FailureCache.Count
+        };
+    }
+
+    public static int RegisteredTypeCount => EncapsulatedPacketTypes.Count;
+
+    public class EncapsulatedPacketFactoryStats {
+        
+        public int RegisteredEncapsulatedTypes { get; set; }
+        public int SuccessCacheSize { get; set; }
+        public int FailureCacheSize { get; set; }
+        
+        public override string ToString() {
+            return $"Encapsulated: {RegisteredEncapsulatedTypes}, Success Cache: {SuccessCacheSize}, Failure Cache: {FailureCacheSize}";
         }
     }
 }

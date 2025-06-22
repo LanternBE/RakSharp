@@ -17,6 +17,7 @@ public class ConnectionRequest : OnlineMessage {
     }
 
     protected internal override void ReadHeader(BinaryReader reader) {
+        
         var packetId = reader.ReadByte();
         if (packetId != (int)PacketId) {
             throw new RakSharpException.InvalidPacketIdException((uint)PacketId, packetId, nameof(ConnectionRequest));
@@ -24,12 +25,14 @@ public class ConnectionRequest : OnlineMessage {
     }
 
     protected override void WritePayload(BinaryWriter writer) {
+        
         writer.WriteLongBigEndian(ClientId);
         writer.WriteLongBigEndian(Time);
         writer.WriteBoolean(UseSecurity);
     }
 
     protected override void ReadPayload(BinaryReader reader) {
+        
         ClientId = reader.ReadLongBigEndian();
         Time = reader.ReadLongBigEndian();
         UseSecurity = reader.ReadBoolean();

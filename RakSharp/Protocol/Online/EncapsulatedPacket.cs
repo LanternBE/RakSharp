@@ -131,8 +131,7 @@ public class EncapsulatedPacket {
                 OrderChannel = orderChannel,
                 Buffer = data
             };
-        }
-        catch (Exception x) {
+        } catch (Exception x) {
             Logger.LogError("Error creating EncapsulatedPacket:", x);
         } finally {
             ArrayPool<byte>.Shared.Return(buffer);

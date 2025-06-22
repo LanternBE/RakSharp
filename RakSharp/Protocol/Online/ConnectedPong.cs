@@ -1,6 +1,4 @@
-﻿using System.Net;
-using RakSharp.Packet;
-using RakSharp.Utils.Sessions;
+﻿using RakSharp.Packet;
 using BinaryReader = RakSharp.Binary.BinaryReader;
 using BinaryWriter = RakSharp.Binary.BinaryWriter;
 
@@ -18,6 +16,7 @@ public class ConnectedPong : OnlineMessage {
     }
 
     protected internal override void ReadHeader(BinaryReader reader) {
+        
         var packetId = reader.ReadByte();
         if (packetId != (int)PacketId) {
             throw new RakSharpException.InvalidPacketIdException((uint)PacketId, packetId, nameof(ConnectedPong));
@@ -25,16 +24,19 @@ public class ConnectedPong : OnlineMessage {
     }
 
     protected override void WritePayload(BinaryWriter writer) {
+        
         writer.WriteLongBigEndian(Ping);
         writer.WriteLongBigEndian(Pong);
     }
 
     protected override void ReadPayload(BinaryReader reader) {
+        
         Ping = reader.ReadLongBigEndian();
         Pong = reader.ReadLongBigEndian();
     }
 
     public static (ConnectedPong packet, byte[] buffer) Create(long ping, long pong) {
+        
         return OnlineMessage.Create<ConnectedPong>(packet => {
             packet.Ping = ping;
             packet.Pong = pong;
