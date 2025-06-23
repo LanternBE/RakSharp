@@ -13,7 +13,13 @@ public class AcknowledgementHandler : OnlinePacketHandler<Acknowledgement> {
             return false;
         }
 
-        Logger.LogDebug($"Received acknowledgement: {Packet.Packets}");
+        var clientSession = Server.SessionsManager.GetSession(ClientEndPoint);
+        if (clientSession is null) {
+            Logger.LogDebug($"Ignored a Acknowledgement from a client ({ClientEndPoint}) without session.");
+            return false;
+        }
+        
+        clientSession.HandleAcknowledgement(Packet);
         return true;
     }
     

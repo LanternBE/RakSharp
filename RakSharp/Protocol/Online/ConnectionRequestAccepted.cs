@@ -6,10 +6,11 @@ using BinaryWriter = RakSharp.Binary.BinaryWriter;
 namespace RakSharp.Protocol.Online;
 
 public class ConnectionRequestAccepted : OnlineMessage {
+    
     public override MessagesIdentifier.OnlineMessages PacketId => MessagesIdentifier.OnlineMessages.ConnectionRequestAccepted;
 
-    public IPEndPoint? ClientAddress { get; private set; } = null;
-    public List<IPEndPoint>? SystemAddresses { get; private set; } = null;
+    public IPEndPoint? ClientAddress { get; private set; }
+    public List<IPEndPoint>? SystemAddresses { get; private set; }
     public long SendPingTime { get; private set; }
     public long SendPongTime { get; private set; }
     
@@ -18,6 +19,7 @@ public class ConnectionRequestAccepted : OnlineMessage {
     }
 
     protected internal override void ReadHeader(BinaryReader reader) {
+        
         var packetId = reader.ReadByte();
         if (packetId != (int)PacketId) {
             throw new RakSharpException.InvalidPacketIdException((uint)PacketId, packetId, nameof(Acknowledgement));
@@ -25,11 +27,13 @@ public class ConnectionRequestAccepted : OnlineMessage {
     }
 
     protected override void WritePayload(BinaryWriter writer) {
+        
         writer.WriteIpEndPoint(ClientAddress);
         writer.WriteShortBigEndian(0);
 
         var dummy = new IPEndPoint(IPAddress.Parse("0.0.0.0"), 0);
         for (var i = 0; i < 20; i++) {
+            
             var addr = i < SystemAddresses?.Count ? SystemAddresses[i] : dummy;
             writer.WriteIpEndPoint(addr);
         }
@@ -39,6 +43,7 @@ public class ConnectionRequestAccepted : OnlineMessage {
     }
 
     protected override void ReadPayload(BinaryReader reader) {
+        
         ClientAddress = reader.ReadIpEndPoint();
         reader.ReadShortBigEndian();
 
@@ -51,5 +56,15 @@ public class ConnectionRequestAccepted : OnlineMessage {
         
         SendPingTime = reader.ReadLongBigEndian();
         SendPongTime = reader.ReadLongBigEndian();
+    }
+    
+    public static (ConnectionRequestAccepted packet, byte[] buffer) Create(IPEndPoint clientAddress, List<IPEndPoint> systemAddresses, long sendPingTime, long sendPongTime) {
+        
+        return OnlineMessage.Create<ConnectionRequestAccepted>(packet => {
+            packet.ClientAddress = clientAddress;
+            packet.SystemAddresses = systemAddresses;
+            packet.SendPingTime = sendPingTime;
+            packet.SendPongTime = sendPongTime;
+        });
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Net;
+using RakSharp.Protocol.Online;
 
 namespace RakSharp.Utils.Sessions;
 
@@ -52,6 +53,17 @@ public class ClientSession : IDisposable {
     
     public void UpdateLastPacketTime() {
         LastPacketTime = DateTime.UtcNow;
+    }
+    
+    public void HandleAcknowledgement(Acknowledgement ack) {
+        
+        foreach (var sequenceNumber in ack.Packets) {
+            if (_pendingReliablePackets.Remove(sequenceNumber)) {
+                Logger.LogDebug($"ACK: Confirmed reliable packet {sequenceNumber} from {RemoteEndPoint}");
+            } else {
+                Logger.LogWarn($"ACK: Got unknown sequence number {sequenceNumber} from {RemoteEndPoint}");
+            }
+        }
     }
 
     public void Disconnect(string reason = "Disconnected") {

@@ -37,4 +37,13 @@ public class ConnectionRequest : OnlineMessage {
         Time = reader.ReadLongBigEndian();
         UseSecurity = reader.ReadBoolean();
     }
+    
+    public static (ConnectionRequest packet, byte[] buffer) Create(long clientId, long time, bool useSecurity) {
+        
+        return OnlineMessage.Create<ConnectionRequest>(packet => {
+            packet.ClientId = clientId;
+            packet.Time = time;
+            packet.UseSecurity = useSecurity;
+        });
+    }
 }

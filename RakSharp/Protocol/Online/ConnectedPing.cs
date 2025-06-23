@@ -5,6 +5,7 @@ using BinaryWriter = RakSharp.Binary.BinaryWriter;
 namespace RakSharp.Protocol.Online;
 
 public class ConnectedPing : OnlineMessage {
+    
     public override MessagesIdentifier.OnlineMessages PacketId => MessagesIdentifier.OnlineMessages.ConnectedPing;
     
     public long Time { get; private set; }
@@ -27,5 +28,12 @@ public class ConnectedPing : OnlineMessage {
 
     protected override void ReadPayload(BinaryReader reader) {
         Time = reader.ReadLongBigEndian();
+    }
+    
+    public static (ConnectedPing packet, byte[] buffer) Create(long time) {
+        
+        return OnlineMessage.Create<ConnectedPing>(packet => {
+            packet.Time = time;
+        });
     }
 }

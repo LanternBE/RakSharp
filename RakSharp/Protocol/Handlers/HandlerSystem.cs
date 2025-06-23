@@ -24,6 +24,8 @@ public static class HandlerSystem {
         
         RegisterHandler<ConnectedPing, ConnectedPingHandler>();
         RegisterHandler<ConnectionRequest, ConnectionRequestHandler>();
+        RegisterHandler<NewIncomingConnection, NewIncomingConnectionHandler>();
+        RegisterHandler<Disconnect, DisconnectHandler>();
     }
 
     public static void RegisterHandler<TPacket, THandler>() where THandler : class {

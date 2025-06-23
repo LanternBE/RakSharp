@@ -21,11 +21,10 @@ public class DatagramHandler : OnlinePacketHandler<Datagram> {
         }
 
         await SendOnlineMessageAsync(Acknowledgement.Create([Packet.SeqNumber]));
-        Logger.LogInfo($"Sent Acknowledgement to client ({ClientEndPoint})");
-        
         clientSession.UpdateLastPacketTime();
+        
         foreach (var encapsulatedPacket in Packet.Packets) {
-            
+
             var packet = EncapsulatedPacketFactory.CreateFromBuffer(encapsulatedPacket.Buffer);
             if (packet is null) {
                 Logger.LogError("Error while parsing an EncapsulatedPacket");

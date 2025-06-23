@@ -7,7 +7,6 @@ public class ConnectedPingHandler : EncapsulatedPacketHandler<ConnectedPing> {
     public override async Task<bool> HandleAsync() {
 
         await SendConnectedPongAsync(Packet.Time);
-        Console.WriteLine("LOL");
         return true;
     }
 }

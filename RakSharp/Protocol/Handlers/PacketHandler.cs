@@ -89,12 +89,11 @@ public abstract class EncapsulatedPacketHandler<T> {
         
         var session = Server.SessionsManager.GetSession(ClientEndPoint);
         if (session == null) {
-            Logger.LogWarn($"Received connected ping from unknown session: {ClientEndPoint}");
             return;
         }
 
         var connectedPong = ConnectedPong.Create(time, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-        var encapsulatedPacket = EncapsulatedPacket.Create(connectedPong, PacketReliability.Reliable, session.GetNextReliableIndex(), session.GetNextOrderedIndex());
+        var encapsulatedPacket = EncapsulatedPacket.Create(connectedPong.packet, PacketReliability.Reliable, session.GetNextReliableIndex(), session.GetNextOrderedIndex());
         
         if (encapsulatedPacket is null) {
             Logger.LogError($"Failed to create connected pong for session: {ClientEndPoint}");

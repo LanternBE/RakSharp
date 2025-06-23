@@ -5,6 +5,7 @@ using BinaryWriter = RakSharp.Binary.BinaryWriter;
 namespace RakSharp.Protocol.Online;
 
 public class Disconnect : OnlineMessage {
+    
     public override MessagesIdentifier.OnlineMessages PacketId => MessagesIdentifier.OnlineMessages.DisconnectionNotification;
     
     protected override void WriteHeader(BinaryWriter writer) {
@@ -12,9 +13,10 @@ public class Disconnect : OnlineMessage {
     }
 
     protected internal override void ReadHeader(BinaryReader reader) {
+        
         var packetId = reader.ReadByte();
         if (packetId != (int)PacketId) {
-            throw new RakSharpException.InvalidPacketIdException((uint)PacketId, packetId, nameof(Acknowledgement));
+            throw new RakSharpException.InvalidPacketIdException((uint)PacketId, packetId, nameof(Disconnect));
         }
     }
 
@@ -23,5 +25,10 @@ public class Disconnect : OnlineMessage {
     }
 
     protected override void ReadPayload(BinaryReader reader) {
+    }
+    
+    public static (Disconnect packet, byte[] buffer) Create() {
+        
+        return OnlineMessage.Create<Disconnect>(_ => { });
     }
 }
