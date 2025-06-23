@@ -6,12 +6,11 @@ using RakSharp.Protocol.Online;
 
 namespace RakSharp.Protocol.Handlers;
 
-public static class HandlerSystem {
+public class HandlerSystem {
     
-    private static readonly Dictionary<Type, Type> PacketHandlers = new();
+    private readonly Dictionary<Type, Type> _packetHandlers = new();
 
-    public static void InitializeDefaultHandlers() {
-        
+    public void InitializeDefaultHandlers() {
         RegisterHandler<UnconnectedPing, UnconnectedPingHandler>();
         RegisterHandler<UnconnectedPong, UnconnectedPongHandler>();
         RegisterHandler<OpenConnectionRequestFirst, OpenConnectionRequestFirstHandler>();
@@ -28,15 +27,15 @@ public static class HandlerSystem {
         RegisterHandler<Disconnect, DisconnectHandler>();
     }
 
-    public static void RegisterHandler<TPacket, THandler>() where THandler : class {
-        PacketHandlers[typeof(TPacket)] = typeof(THandler);
+    public void RegisterHandler<TPacket, THandler>() where THandler : class {
+        _packetHandlers[typeof(TPacket)] = typeof(THandler);
     }
 
-    public static Type GetHandlerType(Type packetType) {
-        return PacketHandlers[packetType];
+    public Type? GetHandlerType(Type packetType) {
+        return _packetHandlers.TryGetValue(packetType, out var handlerType) ? handlerType : null;
     }
 
-    public static object CreateHandler(Type handlerType) {
+    public object CreateHandler(Type handlerType) {
         return Activator.CreateInstance(handlerType);
     }
 }

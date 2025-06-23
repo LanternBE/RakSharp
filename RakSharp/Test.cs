@@ -1,4 +1,7 @@
-﻿using RakSharp;
+﻿using System.Net;
+using RakSharp;
 
-var server = new Server();
+var address = new IPEndPoint(IPAddress.Any, 19132);
+var server = new Server(address);
+
 await server.Start();

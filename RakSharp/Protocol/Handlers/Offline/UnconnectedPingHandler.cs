@@ -13,8 +13,7 @@ public class UnconnectedPingHandler : OfflinePacketHandler<UnconnectedPing> {
             return false;
         }
 
-        //Server.ServerInfo.OnlinePlayers = Server.SessionsManager.GetSessions().Count;
-        Server.ServerInfo.OnlinePlayers = 9; // TODO: Replace this with ^, we need this for testing if the raknet is actually working lol.
+        Server.ServerInfo.OnlinePlayers = Server.SessionsManager.GetSessions().Count;
         var response = UnconnectedPong.Create(
             Packet.Timestamp, 
             Server.ServerInfo.ServerGuid, 

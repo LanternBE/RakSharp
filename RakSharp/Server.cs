@@ -10,11 +10,18 @@ namespace RakSharp;
 
 public class Server {
 
-    public IPEndPoint ServerAddress { get; set; } = new(IPAddress.Any, 19132);
+    public IPEndPoint ServerAddress { get; set; }
     public Socket Socket { get; set; } = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
     public ServerInfo ServerInfo { get; set; } = new();
     public SessionsManager SessionsManager { get; set; } = new();
     public PacketProcessor PacketProcessor { get; set; }
+    public HandlerSystem HandlerSystem { get; set; } = new();
+
+    public Server(IPEndPoint serverAddress) {
+        
+        ServerAddress = serverAddress;
+        HandlerSystem.InitializeDefaultHandlers();
+    }
 
     public bool IsRunning { get; set; }
 
@@ -31,10 +38,9 @@ public class Server {
         Socket.EnableBroadcast = true;
         Socket.Bind(ServerAddress);
         
-        HandlerSystem.InitializeDefaultHandlers();
         IsRunning = true;
+        PacketProcessor = new PacketProcessor(Socket, this, HandlerSystem);
         
-        PacketProcessor = new PacketProcessor(Socket, this);
         while (IsRunning) {
             
             var sender = new IPEndPoint(IPAddress.Any, 0);
