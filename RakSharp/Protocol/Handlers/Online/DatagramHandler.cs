@@ -25,6 +25,11 @@ public class DatagramHandler : OnlinePacketHandler<Datagram> {
         
         foreach (var encapsulatedPacket in Packet.Packets) {
 
+            if (encapsulatedPacket.Buffer[0] == 254) {
+                Server.RaiseGamePacketReceived(clientSession, encapsulatedPacket);
+                continue;
+            }
+
             var packet = EncapsulatedPacketFactory.CreateFromBuffer(encapsulatedPacket.Buffer);
             if (packet is null) {
                 Logger.LogError("Error while parsing an EncapsulatedPacket");

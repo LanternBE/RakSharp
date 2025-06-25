@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using RakSharp.Packet;
 using RakSharp.Protocol;
 using RakSharp.Protocol.Handlers;
+using RakSharp.Protocol.Online;
 using RakSharp.Utils;
 using RakSharp.Utils.Sessions;
 
@@ -16,6 +17,8 @@ public class Server {
     public SessionsManager SessionsManager { get; set; } = new();
     public PacketProcessor PacketProcessor { get; set; }
     public HandlerSystem HandlerSystem { get; set; } = new();
+    
+    public static event Action<ClientSession, EncapsulatedPacket>? OnGamePacketReceived;
 
     public Server(IPEndPoint serverAddress) {
         
@@ -67,5 +70,9 @@ public class Server {
         Logger.LogInfo("RakNet stopped.");
         
         await Task.Delay(0); // TODO: Need to remove this, i used it just to disable the warning from the ide lol.
+    }
+    
+    public static void RaiseGamePacketReceived(ClientSession clientSession, EncapsulatedPacket encapsulatedPacket) {
+        OnGamePacketReceived?.Invoke(clientSession, encapsulatedPacket);
     }
 }
