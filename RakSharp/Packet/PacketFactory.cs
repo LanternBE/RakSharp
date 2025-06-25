@@ -57,7 +57,7 @@ public static class DynamicPacketFactory {
         }
     }
     
-    public static OfflineMessage? CreateOfflineMessageFromBuffer(byte[] buffer) {
+    public static OfflineMessage CreateOfflineMessageFromBuffer(byte[] buffer) {
         
         if (buffer.Length == 0) {
             throw new PacketCorruptedException("Unknown", "Empty buffer");
@@ -79,7 +79,7 @@ public static class DynamicPacketFactory {
             try {
                 
                 var packet = TryCreateOfflinePacket(packetType, buffer);
-                if (packet == null) 
+                if (packet is null) 
                     continue;
                 
                 SuccessCache[firstByte] = (packetType, false);
