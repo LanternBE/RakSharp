@@ -180,4 +180,14 @@ public class BinaryWriter(byte[] buffer) {
                 throw new InvalidOperationException("Unsupported address family");
         }
     }
+    
+    public void WriteVarUInt(long value) {
+        
+        while ((value & 4294967168) != 0) {
+            WriteByte((byte)((value & 127) | 128));
+            value >>= 7;
+        }
+
+        WriteByte((byte)(value & 127));
+    }
 }

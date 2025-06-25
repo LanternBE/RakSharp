@@ -228,4 +228,47 @@ public class BinaryReader(byte[] buffer) {
 
         return new IPEndPoint(address, port);
     }
+    
+    public int ReadVarInt() {
+        
+        var result = 0;
+        var shift = 0;
+
+        while (true) {
+            
+            if (Position >= Buffer.Length)
+                throw new InvalidOperationException("Unexpected end of buffer while reading VarInt.");
+
+            var b = Buffer[Position++];
+            result |= (b & 127) << shift;
+
+            shift += 7;
+            if ((b & 128) == 0)
+                break;
+
+            if (shift > 35)
+                throw new FormatException("VarInt is too large.");
+        }
+        
+        return result;
+    }
+    
+    
+    public uint ReadVarUInt() {
+        
+        uint result = 0;
+        for (var i = 0; i <= 28; i += 7) {
+        
+            if (Position >= Buffer.Length)
+                throw new ArgumentOutOfRangeException(nameof(Position), "No bytes left in buffer");
+
+            var b = Buffer[Position++];
+            result |= (uint)(b & 127) << i;
+        
+            if ((b & 128) == 0)
+                return result;
+        }
+    
+        throw new FormatException("VarInt did not terminate after 5 bytes!");
+    }
 }
