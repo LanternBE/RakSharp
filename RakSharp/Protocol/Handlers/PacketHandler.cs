@@ -81,7 +81,12 @@ public abstract class EncapsulatedPacketHandler<T> {
             return;
         }
         
-        var datagram = Datagram.Create(0, [response.packet], session.GetNextSequenceNumber());
+        var sequenceNumber = session.GetNextSequenceNumber();
+        var datagram = Datagram.Create(0, [response.packet], sequenceNumber);
+        
+        if (response.packet.Reliability is PacketReliability.Reliable or PacketReliability.ReliableOrdered) 
+            session.TrackReliablePacket(sequenceNumber, datagram);
+        
         await Socket.SendToAsync(datagram.buffer, SocketFlags.None, ClientEndPoint);
     }
 

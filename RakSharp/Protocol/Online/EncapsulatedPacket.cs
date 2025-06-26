@@ -157,6 +157,17 @@ public class EncapsulatedPacket {
         
         return null;
     }
+    
+    public static EncapsulatedPacket Create(byte[] buffer, int reliability, int connectionReliableIndex, int connectionOrderedIndex, byte orderChannel = 0) {
+        
+        return new EncapsulatedPacket {
+            Reliability = reliability,
+            MessageIndex = PacketReliability.IsReliable(reliability) ? connectionReliableIndex : null,
+            OrderIndex = PacketReliability.IsOrdered(reliability) ? connectionOrderedIndex : null,
+            OrderChannel = orderChannel,
+            Buffer = buffer
+        };
+    }
 
     public int GetTotalLength() => GetHeaderLength() + Buffer.Length;
 }
