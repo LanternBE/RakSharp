@@ -190,4 +190,26 @@ public class BinaryWriter(byte[] buffer) {
 
         WriteByte((byte)(value & 127));
     }
+    
+    public void WriteVarInt(int value) {
+        
+        var zigzag = (uint)((value << 1) ^ (value >> 31));
+        while ((zigzag & 4294967168) != 0) {
+            WriteByte((byte)((zigzag & 127) | 128));
+            zigzag >>= 7;
+        }
+
+        WriteByte((byte)(zigzag & 127));
+    }
+    
+    public void WriteVarIntSimple(int value) {
+        
+        var unsignedValue = (uint)value;
+        while ((unsignedValue & 4294967168) != 0) {
+            WriteByte((byte)((unsignedValue & 127) | 128));
+            unsignedValue >>= 7;
+        }
+
+        WriteByte((byte)(unsignedValue & 127));
+    }
 }

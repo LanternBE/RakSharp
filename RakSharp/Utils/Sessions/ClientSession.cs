@@ -11,8 +11,7 @@ public class ClientSession : IDisposable {
     public int ProtocolVersion { get; set; }
     
     public ConnectionState State { get; set; }
-    public bool Compression { get; set; }
-    public ushort CompressionThreshold { get; set; }
+    public object Compression { get; set; }
     
     public int NextSequenceNumber { get; set; }
     public int NextReliableIndex { get; set; }
