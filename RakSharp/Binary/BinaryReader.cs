@@ -16,6 +16,14 @@ public class BinaryReader(byte[] buffer) {
     public bool ReadBoolean() => ReadByte() is 1;
     public byte[] ReadRemainingBytes() => ReadBytes(Buffer.Length - Position);
     
+    public byte[] GetReadBytes() {
+        
+        var result = new byte[Position];
+        Buffer.AsSpan(0, Position).CopyTo(result);
+        
+        return result;
+    }
+    
     public byte[] ReadBytes(int length) {
         
         if (length > Remaining)

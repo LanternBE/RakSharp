@@ -23,7 +23,7 @@ public class EncapsulatedPacket {
     public int? IdentifierACK { get; set; } = null;
 
     public static EncapsulatedPacket? FromBytes(BinaryReader reader) {
-        
+
         if (reader.Remaining < 3) {
             return null;
         }
@@ -31,41 +31,21 @@ public class EncapsulatedPacket {
         var packet = new EncapsulatedPacket();
         var flags = reader.ReadByte();
         
-        packet.Reliability = (flags & ReliabilityFlags) >> ReliabilityShift;
+        packet.Reliability = (flags & ReliabilityFlags) >>  ReliabilityShift;
         var hasSplit = (flags & SplitFlag) != 0;
-        
-        if (packet.Reliability > 7) {
-            return null;
-        }
-        
-        var rawLength = reader.ReadUnsignedShortBigEndian();
-        if (rawLength > 8192 * 8) {
-            return null;
-        }
-        
-        var length = (rawLength + 7) / 8;
-        if (length == 0)
-            return null;
-        
-        var expectedHeaderSize = 0;
-        if (PacketReliability.IsReliable(packet.Reliability))
-            expectedHeaderSize += 3;
-        if (PacketReliability.IsSequenced(packet.Reliability))
-            expectedHeaderSize += 3;
-        if (PacketReliability.IsSequencedOrOrdered(packet.Reliability))
-            expectedHeaderSize += 4; // 3 + 1
-        if (hasSplit)
-            expectedHeaderSize += SplitInfoLength;
-        
-        if (expectedHeaderSize + length > reader.Remaining) {
-            return null;
-        }
-        
-        if (PacketReliability.IsReliable(packet.Reliability))
-            packet.MessageIndex = reader.ReadTriadLittleEndian();
 
-        if (PacketReliability.IsSequenced(packet.Reliability))
+        var length = (int)Math.Ceiling((decimal)(reader.ReadShortBigEndian() / 8));
+        if (length is 0 or < 0) {
+            return null;
+        }
+
+        if (PacketReliability.IsReliable(packet.Reliability)) {
+            packet.MessageIndex = reader.ReadTriadLittleEndian();
+        }
+
+        if (PacketReliability.IsSequenced(packet.Reliability)) {
             packet.SequenceIndex = reader.ReadTriadLittleEndian();
+        }
 
         if (PacketReliability.IsSequencedOrOrdered(packet.Reliability)) {
             packet.OrderIndex = reader.ReadTriadLittleEndian();
@@ -73,12 +53,9 @@ public class EncapsulatedPacket {
         }
 
         if (hasSplit) {
-            var splitCount = reader.ReadIntBigEndian();
-            var splitId = reader.ReadShortBigEndian();
-            var splitIndex = reader.ReadIntBigEndian();
-            packet.SplitInfo = new SplitPacketInfo(splitId, splitIndex, splitCount);
+            packet.SplitInfo = new SplitPacketInfo(reader.ReadShortBigEndian(), reader.ReadIntBigEndian(), reader.ReadIntBigEndian());
         }
-
+        
         packet.Buffer = reader.ReadBytes(length);
         return packet;
     }
