@@ -17,6 +17,7 @@ public static class Logger {
     public static void LogInfo(string message) => Log(LogLevel.Info, message);
     public static void LogWarn(string message) => Log(LogLevel.Warn, message);
     public static void LogError(string message, Exception? ex = null) => Log(LogLevel.Error, message, ex);
+    public static void LogError(Exception ex) => Log(LogLevel.Error, string.Empty, ex);
 
     private static void Log(LogLevel level, string message, Exception? ex = null) {
         
@@ -32,7 +33,8 @@ public static class Logger {
             Console.Write(prefix);
             
             Console.ResetColor();
-            Console.WriteLine($" {message}");
+            if (message is not "")
+                Console.WriteLine($" {message}");
 
             if (ex == null) 
                 return;

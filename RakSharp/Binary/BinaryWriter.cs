@@ -181,14 +181,14 @@ public class BinaryWriter(byte[] buffer) {
         }
     }
     
-    public void WriteVarUInt(long value) {
-        
-        while ((value & 4294967168) != 0) {
-            WriteByte((byte)((value & 127) | 128));
+    public void WriteVarUInt(ulong value) {
+    
+        while ((value & 0xFFFFFF80) != 0) {
+            WriteByte((byte)((value & 0x7F) | 0x80));
             value >>= 7;
         }
 
-        WriteByte((byte)(value & 127));
+        WriteByte((byte)(value & 0x7F));
     }
     
     public void WriteVarInt(int value) {
