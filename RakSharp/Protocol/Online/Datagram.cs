@@ -36,8 +36,26 @@ public class Datagram : OnlineMessage {
             writer.Write(packet.ToBytes());
         }
     }
-
+    
     protected override void ReadPayload(BinaryReader reader) {
+
+        SeqNumber = reader.ReadTriadLittleEndian();
+        while (!reader.IsAtEnd()) {
+
+            var startPos = reader.Position;
+            var packet = EncapsulatedPacket.FromBytes(reader);
+        
+            if (packet is not null) {
+                Packets.Add(packet);
+            }
+            
+            if (reader.Position == startPos) {
+                break;
+            }
+        }
+    }
+
+    /*protected override void ReadPayload(BinaryReader reader) {
     
         SeqNumber = reader.ReadTriadLittleEndian();
         var consecutiveFailures = 0;
@@ -78,7 +96,7 @@ public class Datagram : OnlineMessage {
                 reader.Position++;
             }
         }
-    }
+    }*/
 
     public static (Datagram packet, byte[] buffer) Create(byte headerFlags, List<EncapsulatedPacket> packets, int seqNumber) {
         
