@@ -275,7 +275,7 @@ public static class EncapsulatedPacketFactory {
             }
         }
         
-        Logger.LogError("I think you need to create this packet!", new RakSharpException.UnknownPacketIdException(firstByte));
+        Logger.LogError(new RakSharpException.UnknownPacketIdException(firstByte));
         return null;
     }
 

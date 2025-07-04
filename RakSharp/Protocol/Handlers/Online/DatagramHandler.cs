@@ -32,7 +32,6 @@ public class DatagramHandler : OnlinePacketHandler<Datagram> {
 
             var packet = EncapsulatedPacketFactory.CreateFromBuffer(encapsulatedPacket.Buffer);
             if (packet is null) {
-                Logger.LogError("Error while parsing an EncapsulatedPacket");
                 continue;
             }
             

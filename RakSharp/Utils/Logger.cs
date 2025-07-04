@@ -40,9 +40,11 @@ public static class Logger {
                 return;
             
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"[Exception] {ex.GetType().Name}: {ex.Message}");
+            Console.WriteLine($" {ex.GetType().Name}: {ex.Message}");
+
+            if (ex.StackTrace is not null)
+                Console.WriteLine(ex.StackTrace);
             
-            Console.WriteLine(ex.StackTrace);
             Console.ResetColor();
         }
     }

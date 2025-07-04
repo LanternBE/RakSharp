@@ -11,8 +11,4 @@
         <Description>Minecraft Bedrock Edition RakNet.</Description>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="Protocol\Bedrock\" />
-    </ItemGroup>
-
 </Project>
