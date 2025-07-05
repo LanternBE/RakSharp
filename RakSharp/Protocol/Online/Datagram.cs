@@ -9,9 +9,6 @@ public class Datagram : OnlineMessage {
     public override MessagesIdentifier.OnlineMessages PacketId => MessagesIdentifier.OnlineMessages.Datagram;
     
     internal const byte BitflagValid = 0x80;
-    internal const byte BitflagAck = 0x40;
-    internal const byte BitflagNak = 0x20;
-    internal const int HeaderSize = 4;
 
     internal byte HeaderFlags { get; private set; }
     internal List<EncapsulatedPacket> Packets { get; private set; } = [];

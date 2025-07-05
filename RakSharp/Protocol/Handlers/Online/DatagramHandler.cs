@@ -21,8 +21,9 @@ public class DatagramHandler : OnlinePacketHandler<Datagram> {
         }
 
         await SendOnlineMessageAsync(Acknowledgement.Create([Packet.SeqNumber]));
-        clientSession.UpdateLastPacketTime();
+        Logger.LogDebug($"Received a Datagram packet, sending Acknowledgement packet with sequence {Packet.SeqNumber}");
         
+        clientSession.UpdateLastPacketTime();
         foreach (var encapsulatedPacket in Packet.Packets) {
 
             if (encapsulatedPacket.Buffer[0] == 254) {
