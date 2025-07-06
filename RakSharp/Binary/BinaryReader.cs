@@ -231,7 +231,7 @@ public class BinaryReader(byte[] buffer) {
             }
 
             default:
-                throw new InvalidOperationException("Unknown address family.");
+                return new IPEndPoint(IPAddress.Loopback, 19132);
         }
 
         return new IPEndPoint(address, port);
