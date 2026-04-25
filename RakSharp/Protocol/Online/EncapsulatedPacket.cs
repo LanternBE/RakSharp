@@ -34,8 +34,9 @@ public class EncapsulatedPacket {
         packet.Reliability = (flags & ReliabilityFlags) >>  ReliabilityShift;
         var hasSplit = (flags & SplitFlag) != 0;
 
-        var length = (int)Math.Ceiling((decimal)(reader.ReadShortBigEndian() / 8));
-        if (length is 0 or < 0) {
+        var payloadLengthInBits = reader.ReadShortBigEndian();
+        var payloadLengthInBytes = (payloadLengthInBits + 7) / 8;
+        if (payloadLengthInBytes is 0 or < 0) {
             return null;
         }
 
@@ -53,10 +54,15 @@ public class EncapsulatedPacket {
         }
 
         if (hasSplit) {
-            packet.SplitInfo = new SplitPacketInfo(reader.ReadShortBigEndian(), reader.ReadIntBigEndian(), reader.ReadIntBigEndian());
+            // RakNet split section wire order: uint32 splitCount, uint16 splitId, uint32 splitIndex.
+            // SplitPacketInfo constructor order is (id, partIndex, totalPartCount).
+            var totalPartCount = reader.ReadIntBigEndian();
+            var splitId = reader.ReadShortBigEndian();
+            var partIndex = reader.ReadIntBigEndian();
+            packet.SplitInfo = new SplitPacketInfo(splitId, partIndex, totalPartCount);
         }
         
-        packet.Buffer = reader.ReadBytes(length);
+        packet.Buffer = reader.ReadBytes(payloadLengthInBytes);
         return packet;
     }
     
@@ -98,7 +104,7 @@ public class EncapsulatedPacket {
                      + (SplitInfo != null ? SplitInfoLength : 0);
     }
 
-    public static EncapsulatedPacket Create(object packet, int reliability, int connectionReliableIndex, int connectionOrderedIndex, byte orderChannel = 0) {
+    public static EncapsulatedPacket? Create(object packet, int reliability, int connectionReliableIndex, int connectionOrderedIndex, byte orderChannel = 0) {
         
         var reliableIndex = PacketReliability.IsReliable(reliability) ? connectionReliableIndex : 0;
         var orderIndex = PacketReliability.IsOrdered(reliability) ? connectionOrderedIndex : 0;

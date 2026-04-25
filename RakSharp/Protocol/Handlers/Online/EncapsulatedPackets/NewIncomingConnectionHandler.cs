@@ -38,6 +38,9 @@ public class NewIncomingConnectionHandler : EncapsulatedPacketHandler<NewIncomin
         
         var disconnect = Disconnect.Create();
         var response = EncapsulatedPacket.Create(disconnect.packet, PacketReliability.Reliable, clientSession.GetNextReliableIndex(), clientSession.GetNextOrderedIndex());
+        if (response is null) {
+            return;
+        }
 
         await SendEncapsulatedPacketAsync((response, response.Buffer));
         clientSession.Disconnect();

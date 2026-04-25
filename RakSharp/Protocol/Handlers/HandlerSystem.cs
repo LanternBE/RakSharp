@@ -35,7 +35,6 @@ public class HandlerSystem {
         return _packetHandlers.TryGetValue(packetType, out var handlerType) ? handlerType : null;
     }
 
-    public object CreateHandler(Type handlerType) {
-        return Activator.CreateInstance(handlerType);
-    }
+    public object CreateHandler(Type handlerType) =>
+        Activator.CreateInstance(handlerType) ?? throw new InvalidOperationException($"Unable to create handler for type '{handlerType.FullName}'.");
 }

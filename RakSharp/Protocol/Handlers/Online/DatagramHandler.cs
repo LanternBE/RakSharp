@@ -22,6 +22,11 @@ public class DatagramHandler : OnlinePacketHandler<Datagram> {
 
         await SendOnlineMessageAsync(Acknowledgement.Create([Packet.SeqNumber]));
         Logger.LogDebug($"Received a Datagram packet, sending Acknowledgement packet with sequence {Packet.SeqNumber}");
+        var packetProcessor = Server.PacketProcessor;
+        if (packetProcessor is null) {
+            Logger.LogError("PacketProcessor is not initialized.");
+            return false;
+        }
         
         clientSession.UpdateLastPacketTime();
         foreach (var encapsulatedPacket in Packet.Packets) {
@@ -36,7 +41,7 @@ public class DatagramHandler : OnlinePacketHandler<Datagram> {
                 continue;
             }
             
-            var success = await Server.PacketProcessor.ProcessPacketAsync(packet, encapsulatedPacket.Buffer, ClientEndPoint);
+            var success = await packetProcessor.ProcessPacketAsync(packet, encapsulatedPacket.Buffer, ClientEndPoint);
             if (!success) {
                 Logger.LogError("Error while handling an EncapsulatedPacket");
             }

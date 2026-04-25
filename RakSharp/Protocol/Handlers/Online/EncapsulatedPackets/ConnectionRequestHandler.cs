@@ -16,6 +16,9 @@ public class ConnectionRequestHandler : EncapsulatedPacketHandler<ConnectionRequ
         
         var connectionRequestAccepted = ConnectionRequestAccepted.Create(ClientEndPoint, [], DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), 0);
         var response = EncapsulatedPacket.Create(connectionRequestAccepted.packet, PacketReliability.Reliable, clientSession.GetNextReliableIndex(), clientSession.GetNextOrderedIndex());
+        if (response is null) {
+            return false;
+        }
 
         await SendEncapsulatedPacketAsync((response, response.Buffer));
         return true;

@@ -15,7 +15,7 @@ public class Server {
     public Socket Socket { get; set; } = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
     public ServerInfo ServerInfo { get; set; } = new();
     public SessionsManager SessionsManager { get; set; } = new();
-    public PacketProcessor PacketProcessor { get; set; }
+    public PacketProcessor? PacketProcessor { get; set; }
     public HandlerSystem HandlerSystem { get; set; } = new();
     
     public static event Action<ClientSession, EncapsulatedPacket>? OnGamePacketReceived;
@@ -64,12 +64,11 @@ public class Server {
         }
     }
 
-    public async Task Stop() {
+    public Task Stop() {
         
         IsRunning = false;
         Logger.LogInfo("RakNet stopped.");
-        
-        await Task.Delay(0); // TODO: Need to remove this, i used it just to disable the warning from the ide lol.
+        return Task.CompletedTask;
     }
     
     public static void RaiseGamePacketReceived(ClientSession clientSession, EncapsulatedPacket encapsulatedPacket) {

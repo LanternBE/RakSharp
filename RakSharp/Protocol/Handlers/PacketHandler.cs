@@ -8,11 +8,11 @@ namespace RakSharp.Protocol.Handlers;
 
 public abstract class OfflinePacketHandler<T> {
     
-    protected Server Server { get; set; }
-    protected Socket Socket { get; set; }
-    protected IPEndPoint ClientEndPoint { get; set; }
-    protected byte[] Buffer { get; set; }
-    protected T Packet { get; set; }
+    protected Server Server { get; set; } = null!;
+    protected Socket Socket { get; set; } = null!;
+    protected IPEndPoint ClientEndPoint { get; set; } = null!;
+    protected byte[] Buffer { get; set; } = null!;
+    protected T Packet { get; set; } = default!;
 
     public void Initialize(Server server, Socket socket, IPEndPoint clientEndPoint, byte[] buffer, T packet) {
         
@@ -32,11 +32,11 @@ public abstract class OfflinePacketHandler<T> {
 
 public abstract class OnlinePacketHandler<T> {
     
-    protected Server Server { get; set; }
-    protected Socket Socket { get; set; }
-    protected IPEndPoint ClientEndPoint { get; set; }
-    protected byte[] Buffer { get; set; }
-    protected T Packet { get; set; }
+    protected Server Server { get; set; } = null!;
+    protected Socket Socket { get; set; } = null!;
+    protected IPEndPoint ClientEndPoint { get; set; } = null!;
+    protected byte[] Buffer { get; set; } = null!;
+    protected T Packet { get; set; } = default!;
 
     public void Initialize(Server server, Socket socket, IPEndPoint clientEndPoint, byte[] buffer, T packet) {
         
@@ -56,11 +56,11 @@ public abstract class OnlinePacketHandler<T> {
 
 public abstract class EncapsulatedPacketHandler<T> {
     
-    protected Server Server { get; set; }
-    protected Socket Socket { get; set; }
-    protected IPEndPoint ClientEndPoint { get; set; }
-    protected byte[] Buffer { get; set; }
-    protected T Packet { get; set; }
+    protected Server Server { get; set; } = null!;
+    protected Socket Socket { get; set; } = null!;
+    protected IPEndPoint ClientEndPoint { get; set; } = null!;
+    protected byte[] Buffer { get; set; } = null!;
+    protected T Packet { get; set; } = default!;
 
     public void Initialize(Server server, Socket socket, IPEndPoint clientEndPoint, byte[] buffer, T packet) {
         
