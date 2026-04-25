@@ -1,0 +1,12 @@
+/home/runner/work/RakSharp/RakSharp/RakSharp/bin/Debug/net9.0/RakSharp.deps.json
+/home/runner/work/RakSharp/RakSharp/RakSharp/bin/Debug/net9.0/RakSharp.dll
+/home/runner/work/RakSharp/RakSharp/RakSharp/bin/Debug/net9.0/RakSharp.pdb
+/home/runner/work/RakSharp/RakSharp/RakSharp/obj/Debug/net9.0/RakSharp.GeneratedMSBuildEditorConfig.editorconfig
+/home/runner/work/RakSharp/RakSharp/RakSharp/obj/Debug/net9.0/RakSharp.AssemblyInfoInputs.cache
+/home/runner/work/RakSharp/RakSharp/RakSharp/obj/Debug/net9.0/RakSharp.AssemblyInfo.cs
+/home/runner/work/RakSharp/RakSharp/RakSharp/obj/Debug/net9.0/RakSharp.csproj.CoreCompileInputs.cache
+/home/runner/work/RakSharp/RakSharp/RakSharp/obj/Debug/net9.0/RakSharp.sourcelink.json
+/home/runner/work/RakSharp/RakSharp/RakSharp/obj/Debug/net9.0/RakSharp.dll
+/home/runner/work/RakSharp/RakSharp/RakSharp/obj/Debug/net9.0/refint/RakSharp.dll
+/home/runner/work/RakSharp/RakSharp/RakSharp/obj/Debug/net9.0/RakSharp.pdb
+/home/runner/work/RakSharp/RakSharp/RakSharp/obj/Debug/net9.0/ref/RakSharp.dll
