@@ -55,6 +55,7 @@ public class EncapsulatedPacket {
 
         if (hasSplit) {
             // RakNet split section wire order: uint32 splitCount, uint16 splitId, uint32 splitIndex.
+            // SplitPacketInfo constructor order is (id, partIndex, totalPartCount).
             var totalPartCount = reader.ReadIntBigEndian();
             var splitId = reader.ReadShortBigEndian();
             var partIndex = reader.ReadIntBigEndian();
