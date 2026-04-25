@@ -34,9 +34,9 @@ public class EncapsulatedPacket {
         packet.Reliability = (flags & ReliabilityFlags) >>  ReliabilityShift;
         var hasSplit = (flags & SplitFlag) != 0;
 
-        var lengthInBits = reader.ReadShortBigEndian();
-        var length = (lengthInBits + 7) / 8;
-        if (length is 0 or < 0) {
+        var payloadLengthInBits = reader.ReadShortBigEndian();
+        var payloadLengthInBytes = (payloadLengthInBits + 7) / 8;
+        if (payloadLengthInBytes is 0 or < 0) {
             return null;
         }
 
@@ -62,7 +62,7 @@ public class EncapsulatedPacket {
             packet.SplitInfo = new SplitPacketInfo(splitId, partIndex, totalPartCount);
         }
         
-        packet.Buffer = reader.ReadBytes(length);
+        packet.Buffer = reader.ReadBytes(payloadLengthInBytes);
         return packet;
     }
     

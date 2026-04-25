@@ -206,7 +206,7 @@ public class BinaryWriter {
                 temp |= 0x80;
             }
 
-            WriteByte(temp);
+            Buffer[Position++] = temp;
         } while (value != 0);
     }
     
