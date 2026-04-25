@@ -34,7 +34,8 @@ public class EncapsulatedPacket {
         packet.Reliability = (flags & ReliabilityFlags) >>  ReliabilityShift;
         var hasSplit = (flags & SplitFlag) != 0;
 
-        var length = (int)Math.Ceiling((decimal)(reader.ReadShortBigEndian() / 8));
+        var lengthInBits = reader.ReadShortBigEndian();
+        var length = (lengthInBits + 7) / 8;
         if (length is 0 or < 0) {
             return null;
         }
@@ -53,7 +54,10 @@ public class EncapsulatedPacket {
         }
 
         if (hasSplit) {
-            packet.SplitInfo = new SplitPacketInfo(reader.ReadShortBigEndian(), reader.ReadIntBigEndian(), reader.ReadIntBigEndian());
+            var totalPartCount = reader.ReadIntBigEndian();
+            var splitId = reader.ReadShortBigEndian();
+            var partIndex = reader.ReadIntBigEndian();
+            packet.SplitInfo = new SplitPacketInfo(splitId, partIndex, totalPartCount);
         }
         
         packet.Buffer = reader.ReadBytes(length);
@@ -98,7 +102,7 @@ public class EncapsulatedPacket {
                      + (SplitInfo != null ? SplitInfoLength : 0);
     }
 
-    public static EncapsulatedPacket Create(object packet, int reliability, int connectionReliableIndex, int connectionOrderedIndex, byte orderChannel = 0) {
+    public static EncapsulatedPacket? Create(object packet, int reliability, int connectionReliableIndex, int connectionOrderedIndex, byte orderChannel = 0) {
         
         var reliableIndex = PacketReliability.IsReliable(reliability) ? connectionReliableIndex : 0;
         var orderIndex = PacketReliability.IsOrdered(reliability) ? connectionOrderedIndex : 0;

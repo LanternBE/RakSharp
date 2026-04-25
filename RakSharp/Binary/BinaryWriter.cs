@@ -5,9 +5,13 @@ using RakSharp.Protocol;
 
 namespace RakSharp.Binary;
 
-public class BinaryWriter(byte[] buffer) {
+public class BinaryWriter {
 
-    public byte[] Buffer { get; } = buffer;
+    public BinaryWriter(byte[] buffer) {
+        Buffer = buffer;
+    }
+
+    public byte[] Buffer { get; }
     public int Position { get; set; }
     public byte[] ToArray() => Buffer[..Position];
 
@@ -202,7 +206,7 @@ public class BinaryWriter(byte[] buffer) {
                 temp |= 0x80;
             }
 
-            buffer[Position++] = temp;
+            WriteByte(temp);
         } while (value != 0);
     }
     
